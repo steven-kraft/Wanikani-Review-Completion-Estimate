@@ -4,6 +4,8 @@
 // @description Adds an estimated completion time for Wanikani Reviews, based on average time between each correct answer.
 // @include     http://www.wanikani.com/review*
 // @include     https://www.wanikani.com/review*
+// @require     https://unpkg.com/popper.js
+// @require     https://unpkg.com/tippy.js
 // @version     0.1
 // @author      Steven Kraft
 // @grant	none
@@ -101,7 +103,7 @@ function get_average() {
   if(count == 0){
     return 60;
   } else {
-    return timer.current_time() / count;
+    return Math.floor(timer.current_time() / count);
   }
 }
 
@@ -112,22 +114,52 @@ function get_estimated_completion() {
   return completion_time;
 }
 
+function formatAMPM(date) {
+  var hours = date.getHours();
+  var minutes = date.getMinutes();
+  var seconds = date.getSeconds();
+  var ampm = hours >= 12 ? 'pm' : 'am';
+  hours = hours % 12;
+  hours = hours ? hours : 12; // the hour '0' should be '12'
+  minutes = minutes < 10 ? '0'+minutes : minutes;
+  var strTime = hours + ':' + minutes + ':' + seconds + ' ' + ampm;
+  return strTime;
+}
+
+function millisToMinutesAndSeconds(millis) {
+  var minutes = Math.floor(millis / 60000);
+  var seconds = ((millis % 60000) / 1000).toFixed(0);
+  return minutes + ":" + (seconds < 10 ? '0' : '') + seconds;
+}
+
 var elem;
 var est_elem;
 var timer;
+var avg_tippy;
 function init() {
   elem = document.createElement('div');
   timer = new Stopwatch(elem);
   est_elem = document.createElement('div');
   est_elem.style.color = "white";
+  est_elem.style.textShadow = "hsla(0, 0%, 0%, 0.4) 1px 1px 0px"
+  avg_tippy = tippy(est_elem, {
+    content: `Average Time Per Item: ${get_average()} seconds`,
+    placement: 'bottom',
+    arrow: true,
+    arrowType: 'round',
+    animation: 'fade',
+  })
   document.getElementById('summary-button').appendChild(est_elem);
   timer.start();
 }
 
 $.jStorage.listenKeyChange('currentItem', function (key, action) {
-    var message = "Completion Time: ";
-    message += get_estimated_completion().toString().split(" ")[4];
+    var message = `Completion Time: ${formatAMPM(get_estimated_completion())}`;
     est_elem.innerHTML = message;
+    var tip_message = `Average Time Per Item: ${get_average()} seconds`
+    var time = millisToMinutesAndSeconds(timer.current_time() * 1000);
+    tip_message += `</br>Total Time: ${time}`
+    avg_tippy.set({content: tip_message});
 });
 
 // Pause Timer when Window is Out of Focus
