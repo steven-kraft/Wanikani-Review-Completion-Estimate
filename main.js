@@ -101,8 +101,14 @@ var Stopwatch = function(elem, options) {
 function get_average() {
   var count = parseInt($("#completed-count").text());
   if(count == 0){
+    var avg = window.localStorage.getItem('avg')
+    if(avg) {
+      return parseInt(avg);
+    }
     return 60;
   } else {
+    var avg = Math.floor(timer.current_time() / count)
+    window.localStorage.setItem('avg', avg);
     return Math.floor(timer.current_time() / count);
   }
 }
