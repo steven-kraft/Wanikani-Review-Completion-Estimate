@@ -85,18 +85,49 @@ var Stopwatch = function(elem, options) {
     return d;
   }
 
+  function current_time() {
+    return clock/1000;
+  }
+
   // public API
   this.start  = start;
   this.stop   = stop;
   this.reset  = reset;
+  this.current_time  = current_time;
 };
 
+function get_average() {
+  var count = parseInt($("#completed-count").text());
+  if(count == 0){
+    return 60;
+  } else {
+    return timer.current_time() / count;
+  }
+}
+
+function get_estimated_completion() {
+  var avg = get_average() * 1000;
+  var d = Date.now();
+  var completion_time = new Date(d + avg * parseInt($("#available-count").text()));
+  return completion_time;
+}
+
 var elem;
+var est_elem;
+var timer;
 function init() {
   elem = document.createElement('div');
-  var timer = new Stopwatch(elem);
-  document.getElementsByTagName('footer')[0].appendChild(elem);
+  timer = new Stopwatch(elem);
+  est_elem = document.createElement('div');
+  est_elem.style.color = "white";
+  document.getElementById('summary-button').appendChild(est_elem);
   timer.start();
 }
+
+$.jStorage.listenKeyChange('currentItem', function (key, action) {
+    var message = "Completion Time: ";
+    message += get_estimated_completion().toString().split(" ")[4];
+    est_elem.innerHTML = message;
+});
 
 window.onload = init();
