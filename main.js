@@ -100,6 +100,7 @@ var Stopwatch = function(elem, options) {
 
 function get_average() {
   var count = parseInt($("#completed-count").text());
+  // Retrieves average from previous session if one isn't available
   if(count == 0){
     var avg = window.localStorage.getItem('avg')
     if(avg) {
@@ -138,22 +139,31 @@ function millisToMinutesAndSeconds(millis) {
   return minutes + ":" + (seconds < 10 ? '0' : '') + seconds;
 }
 
+function updateTippy() {
+  var tip_message = `Average Time Per Item: ${current_average} seconds`
+  var time = millisToMinutesAndSeconds(timer.current_time() * 1000);
+  tip_message += `</br>Total Time: ${time}`
+  est_tippy.setContent(tip_message);
+}
+
 var elem;
 var est_elem;
 var timer;
-var avg_tippy;
+var est_tippy;
+var current_average;
 function init() {
   elem = document.createElement('div');
   timer = new Stopwatch(elem);
   est_elem = document.createElement('div');
   est_elem.style.color = "white";
   est_elem.style.textShadow = "hsla(0, 0%, 0%, 0.4) 1px 1px 0px"
-  avg_tippy = tippy(est_elem, {
+  est_tippy = tippy(est_elem, {
     content: `Average Time Per Item: ${get_average()} seconds`,
     placement: 'bottom',
     arrow: true,
     arrowType: 'round',
     animation: 'fade',
+    onShow: updateTippy,
   })
   document.getElementById('summary-button').appendChild(est_elem);
   timer.start();
@@ -162,10 +172,7 @@ function init() {
 $.jStorage.listenKeyChange('currentItem', function (key, action) {
     var message = `Completion Time: ${formatAMPM(get_estimated_completion())}`;
     est_elem.innerHTML = message;
-    var tip_message = `Average Time Per Item: ${get_average()} seconds`
-    var time = millisToMinutesAndSeconds(timer.current_time() * 1000);
-    tip_message += `</br>Total Time: ${time}`
-    avg_tippy.set({content: tip_message});
+    current_average = get_average();
 });
 
 // Pause Timer when Window is Out of Focus
