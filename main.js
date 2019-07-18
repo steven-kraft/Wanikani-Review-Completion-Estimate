@@ -130,4 +130,13 @@ $.jStorage.listenKeyChange('currentItem', function (key, action) {
     est_elem.innerHTML = message;
 });
 
+// Pause Timer when Window is Out of Focus
+document.addEventListener("visibilitychange", function() {
+  if(document.visibilityState == "hidden"){
+    timer.stop();
+  } else {
+    timer.start();
+  }
+});
+
 window.onload = init();
