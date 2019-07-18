@@ -79,7 +79,7 @@ function get_average() {
     return 60;
   } else {
     avg = Math.floor(timer.current_time() / count)
-    window.localStorage.setItem('avg', avg);
+    if(avg){window.localStorage.setItem('avg', avg);}
     return Math.floor(timer.current_time() / count);
   }
 }
