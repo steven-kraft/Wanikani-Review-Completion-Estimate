@@ -23,7 +23,7 @@ var Stopwatch = function() {
 
   function start() {
     if (!interval) {
-      offset   = Date.now();
+      offset = Date.now();
       interval = setInterval(update);
     }
   }
@@ -45,7 +45,7 @@ var Stopwatch = function() {
 
   function delta() {
     var now = Date.now(),
-        d   = now - offset;
+        d = now - offset;
 
     offset = now;
     return d;
@@ -60,24 +60,25 @@ var Stopwatch = function() {
   }
 
   // public API
-  this.start  = start;
-  this.stop   = stop;
-  this.reset  = reset;
-  this.current_time  = current_time;
+  this.start = start;
+  this.stop = stop;
+  this.reset = reset;
+  this.current_time = current_time;
   this.adjust_time = adjust_time;
 };
 
 function get_average() {
   var count = parseInt($("#completed-count").text());
   // Retrieves average from previous session if one isn't available
+  var avg;
   if(count == 0){
-    var avg = window.localStorage.getItem('avg')
+    avg = window.localStorage.getItem('avg')
     if(avg) {
       return parseInt(avg);
     }
     return 60;
   } else {
-    var avg = Math.floor(timer.current_time() / count)
+    avg = Math.floor(timer.current_time() / count)
     window.localStorage.setItem('avg', avg);
     return Math.floor(timer.current_time() / count);
   }
