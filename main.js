@@ -12,49 +12,19 @@
 // @license     GPL version 3 or later: http://www.gnu.org/copyleft/gpl.html
 // ==/UserScript==
 
-var Stopwatch = function(elem, options) {
+var Stopwatch = function() {
 
-  var timer       = createTimer(),
-      startButton = createButton("start", start),
-      stopButton  = createButton("stop", stop),
-      resetButton = createButton("reset", reset),
-      offset,
+  var offset,
       clock,
       interval;
-
-  // default options
-  options = options || {};
-  options.delay = options.delay || 1;
-
-  // append elements
-  elem.appendChild(timer);
-  elem.appendChild(startButton);
-  elem.appendChild(stopButton);
-  elem.appendChild(resetButton);
 
   // initialize
   reset();
 
-  // private functions
-  function createTimer() {
-    return document.createElement("span");
-  }
-
-  function createButton(action, handler) {
-    var a = document.createElement("a");
-    a.href = "#" + action;
-    a.innerHTML = action;
-    a.addEventListener("click", function(event) {
-      handler();
-      event.preventDefault();
-    });
-    return a;
-  }
-
   function start() {
     if (!interval) {
       offset   = Date.now();
-      interval = setInterval(update, options.delay);
+      interval = setInterval(update);
     }
   }
 
@@ -67,16 +37,10 @@ var Stopwatch = function(elem, options) {
 
   function reset() {
     clock = 0;
-    render();
   }
 
   function update() {
     clock += delta();
-    render();
-  }
-
-  function render() {
-    timer.innerHTML = clock/1000;
   }
 
   function delta() {
@@ -146,14 +110,12 @@ function updateTippy() {
   est_tippy.setContent(tip_message);
 }
 
-var elem;
 var est_elem;
 var timer;
 var est_tippy;
 var current_average;
 function init() {
-  elem = document.createElement('div');
-  timer = new Stopwatch(elem);
+  timer = new Stopwatch();
   est_elem = document.createElement('div');
   est_elem.style.color = "white";
   est_elem.style.textShadow = "hsla(0, 0%, 0%, 0.4) 1px 1px 0px"
@@ -170,7 +132,7 @@ function init() {
 }
 
 $.jStorage.listenKeyChange('currentItem', function (key, action) {
-    var message = `Completion Time: ${formatAMPM(get_estimated_completion())}`;
+    var message = `Est. Completion Time: ${formatAMPM(get_estimated_completion())}`;
     est_elem.innerHTML = message;
     current_average = get_average();
 });
