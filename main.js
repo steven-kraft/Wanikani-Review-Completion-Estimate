@@ -55,11 +55,16 @@ var Stopwatch = function() {
     return clock/1000;
   }
 
+  function adjust_time(amount) {
+    clock += amount;
+  }
+
   // public API
   this.start  = start;
   this.stop   = stop;
   this.reset  = reset;
   this.current_time  = current_time;
+  this.adjust_time = adjust_time;
 };
 
 function get_average() {
@@ -93,6 +98,7 @@ function formatAMPM(date) {
   hours = hours % 12;
   hours = hours ? hours : 12; // the hour '0' should be '12'
   minutes = minutes < 10 ? '0'+minutes : minutes;
+  seconds = seconds < 10 ? '0'+seconds : seconds;
   var strTime = hours + ':' + minutes + ':' + seconds + ' ' + ampm;
   return strTime;
 }
@@ -114,6 +120,8 @@ var est_elem;
 var timer;
 var est_tippy;
 var current_average;
+var starttime = 0;
+
 function init() {
   timer = new Stopwatch();
   est_elem = document.createElement('div');
@@ -135,6 +143,12 @@ $.jStorage.listenKeyChange('currentItem', function (key, action) {
     var message = `Est. Completion Time: ${formatAMPM(get_estimated_completion())}`;
     est_elem.innerHTML = message;
     current_average = get_average();
+    var item_time = timer.current_time() - starttime;
+    // Maximum time is 60 seconds for single item (reduces impact of being idle)
+    if (item_time > 60) {
+      timer.adjust_time(((item_time - 60) * -1000));
+    }
+    starttime = timer.current_time();
 });
 
 // Pause Timer when Window is Out of Focus
