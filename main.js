@@ -1,14 +1,13 @@
 // ==UserScript==
 // @name        Wanikani Review Completion Estimate
-// @namespace   wkrct
+// @namespace   https://steven-kraft.com/
 // @description Adds an estimated completion time for Wanikani Reviews, based on average time between each correct answer.
-// @include     http://www.wanikani.com/review*
-// @include     https://www.wanikani.com/review*
+// @include     http://www.wanikani.com/review/session*
+// @include     https://www.wanikani.com/review/session*
 // @require     https://unpkg.com/popper.js
 // @require     https://unpkg.com/tippy.js
 // @version     0.1
 // @author      Steven Kraft
-// @grant	none
 // @license     GPL version 3 or later: http://www.gnu.org/copyleft/gpl.html
 // ==/UserScript==
 
