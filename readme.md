@@ -20,5 +20,5 @@ The script works by keeping a running time of your review session and dividing t
 #### Links
 
 - [Download/Install (Greasy Fork)](https://greasyfork.org/en/scripts/387651-wanikani-review-completion-estimate)
-- [Wanikani Community Post]()
+- [Wanikani Community Post](https://community.wanikani.com/t/userscript-wanikani-review-completion-estimate/37906)
 - [My Other Projects](https://steven-kraft.com/projects/japanese/)
