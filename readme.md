@@ -14,7 +14,7 @@ The script works by keeping a running time of your review session and dividing t
 
 - Estimated time updates after every response
 - Timer is paused when Wanikani tab is out of focus
-- Leaving Wanikani Idle will only end of increasing the timer by a maximum of 60 seconds after response (reduces inaccuracies caused by being idle)
+- Leaving Wanikani idle will only end up increasing the timer by a maximum of 60 seconds after response (reduces inaccuracies caused by being idle)
 - Initial estimate is based on average from previous review session, but otherwise is only based on current session
 
 #### Links
