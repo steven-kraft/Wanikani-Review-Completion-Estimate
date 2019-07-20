@@ -125,7 +125,7 @@ var est_tippy;
 var current_average;
 var starttime = 0;
 
-var alternative_display = window.localStorage.getItem('alternative-display')
+var alternative_display = window.localStorage.getItem('alternative-display') == "true"
 if(!alternative_display) {
   alternative_display = false;
 }
@@ -145,6 +145,7 @@ function init() {
   })
   est_elem.addEventListener("click", function(){
       alternative_display = !alternative_display;
+      window.localStorage.setItem('alternative-display', alternative_display)
       draw();
   });
   document.getElementById('summary-button').appendChild(est_elem);
