@@ -6,7 +6,7 @@
 // @include     https://www.wanikani.com/review/session*
 // @require     https://unpkg.com/popper.js
 // @require     https://unpkg.com/tippy.js
-// @version     0.1
+// @version     0.2
 // @author      Steven Kraft
 // @license     GPL version 3 or later: http://www.gnu.org/copyleft/gpl.html
 // ==/UserScript==
@@ -84,10 +84,13 @@ function get_average() {
 }
 
 function get_estimated_completion() {
-  var avg = get_average() * 1000;
   var d = Date.now();
-  var completion_time = new Date(d + avg * parseInt($("#available-count").text()));
-  return completion_time;
+  return new Date(d + get_remaining_time());
+}
+
+function get_remaining_time() {
+  var avg = get_average() * 1000;
+  return avg * parseInt($("#available-count").text());
 }
 
 function formatAMPM(date) {
@@ -106,7 +109,7 @@ function formatAMPM(date) {
 function millisToMinutesAndSeconds(millis) {
   var minutes = Math.floor(millis / 60000);
   var seconds = ((millis % 60000) / 1000).toFixed(0);
-  return minutes + ":" + (seconds < 10 ? '0' : '') + seconds;
+  return minutes + "m " + seconds + "s";
 }
 
 function updateTippy() {
@@ -122,11 +125,17 @@ var est_tippy;
 var current_average;
 var starttime = 0;
 
+var alternative_display = window.localStorage.getItem('alternative-display') == "true"
+if(!alternative_display) {
+  alternative_display = false;
+}
+
 function init() {
   timer = new Stopwatch();
   est_elem = document.createElement('div');
   est_elem.style.color = "white";
   est_elem.style.textShadow = "hsla(0, 0%, 0%, 0.4) 1px 1px 0px"
+  est_elem.style.outlineStyle = "none"
   est_tippy = tippy(est_elem, {
     content: `Average Time Per Item: ${get_average()} seconds`,
     placement: 'bottom',
@@ -135,20 +144,44 @@ function init() {
     animation: 'fade',
     onShow: updateTippy,
   })
+  est_elem.addEventListener("click", function(){
+      alternative_display = !alternative_display;
+      window.localStorage.setItem('alternative-display', alternative_display)
+      draw();
+  });
   document.getElementById('summary-button').appendChild(est_elem);
   timer.start();
 }
 
+var time_remaining_message;
+var completion_time_message;
+
+function update(){
+  current_average = get_average();
+  var item_time = timer.current_time() - starttime;
+  // Maximum time is 60 seconds for single item (reduces impact of being idle)
+  if (item_time > 60) {
+    timer.adjust_time(((item_time - 60) * -1000));
+  }
+  starttime = timer.current_time();
+
+  time_remaining_message = `Est. Time Remaining: ${millisToMinutesAndSeconds(get_remaining_time())}`;
+  completion_time_message = `Est. Completion Time: ${formatAMPM(get_estimated_completion())}`;
+}
+
+function draw(){
+  var message = ""
+  if(alternative_display) {
+    message = time_remaining_message;
+  } else {
+    message = completion_time_message;
+  }
+  est_elem.innerHTML = message;
+}
+
 $.jStorage.listenKeyChange('currentItem', function (key, action) {
-    var message = `Est. Completion Time: ${formatAMPM(get_estimated_completion())}`;
-    est_elem.innerHTML = message;
-    current_average = get_average();
-    var item_time = timer.current_time() - starttime;
-    // Maximum time is 60 seconds for single item (reduces impact of being idle)
-    if (item_time > 60) {
-      timer.adjust_time(((item_time - 60) * -1000));
-    }
-    starttime = timer.current_time();
+    update();
+    draw();
 });
 
 // Pause Timer when Window is Out of Focus
