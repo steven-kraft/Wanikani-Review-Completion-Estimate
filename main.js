@@ -84,10 +84,13 @@ function get_average() {
 }
 
 function get_estimated_completion() {
-  var avg = get_average() * 1000;
   var d = Date.now();
-  var completion_time = new Date(d + avg * parseInt($("#available-count").text()));
-  return completion_time;
+  return new Date(d + get_remaining_time());
+}
+
+function get_remaining_time() {
+  var avg = get_average() * 1000;
+  return avg * parseInt($("#available-count").text());
 }
 
 function formatAMPM(date) {
@@ -122,6 +125,11 @@ var est_tippy;
 var current_average;
 var starttime = 0;
 
+var alternative_display = window.localStorage.getItem('alternative-display')
+if(!alternative_display) {
+  alternative_display = false;
+}
+
 function init() {
   timer = new Stopwatch();
   est_elem = document.createElement('div');
@@ -135,20 +143,43 @@ function init() {
     animation: 'fade',
     onShow: updateTippy,
   })
+  est_elem.addEventListener("click", function(){
+      alternative_display = !alternative_display;
+      draw();
+  });
   document.getElementById('summary-button').appendChild(est_elem);
   timer.start();
 }
 
+var time_remaining_message;
+var completion_time_message;
+
+function update(){
+  current_average = get_average();
+  var item_time = timer.current_time() - starttime;
+  // Maximum time is 60 seconds for single item (reduces impact of being idle)
+  if (item_time > 60) {
+    timer.adjust_time(((item_time - 60) * -1000));
+  }
+  starttime = timer.current_time();
+
+  time_remaining_message = `Est. Time Remaining: ${millisToMinutesAndSeconds(get_remaining_time())}`;
+  completion_time_message = `Est. Completion Time: ${formatAMPM(get_estimated_completion())}`;
+}
+
+function draw(){
+  var message = ""
+  if(alternative_display) {
+    message = time_remaining_message;
+  } else {
+    message = completion_time_message;
+  }
+  est_elem.innerHTML = message;
+}
+
 $.jStorage.listenKeyChange('currentItem', function (key, action) {
-    var message = `Est. Completion Time: ${formatAMPM(get_estimated_completion())}`;
-    est_elem.innerHTML = message;
-    current_average = get_average();
-    var item_time = timer.current_time() - starttime;
-    // Maximum time is 60 seconds for single item (reduces impact of being idle)
-    if (item_time > 60) {
-      timer.adjust_time(((item_time - 60) * -1000));
-    }
-    starttime = timer.current_time();
+    update();
+    draw();
 });
 
 // Pause Timer when Window is Out of Focus
