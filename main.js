@@ -135,6 +135,7 @@ function init() {
   est_elem = document.createElement('div');
   est_elem.style.color = "white";
   est_elem.style.textShadow = "hsla(0, 0%, 0%, 0.4) 1px 1px 0px"
+  est_elem.style.outlineStyle = "none"
   est_tippy = tippy(est_elem, {
     content: `Average Time Per Item: ${get_average()} seconds`,
     placement: 'bottom',
