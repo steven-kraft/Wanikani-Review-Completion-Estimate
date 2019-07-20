@@ -6,7 +6,7 @@
 // @include     https://www.wanikani.com/review/session*
 // @require     https://unpkg.com/popper.js
 // @require     https://unpkg.com/tippy.js
-// @version     0.1
+// @version     0.2
 // @author      Steven Kraft
 // @license     GPL version 3 or later: http://www.gnu.org/copyleft/gpl.html
 // ==/UserScript==
